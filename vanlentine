@@ -1,80 +1,183 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Ma Valentine 💘</title>
-
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ma Valentine</title>
+<style>
+    /* ===== STYLE ===== */
     body {
-      background: #ffdde1;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 150px;
-      overflow: hidden;
+        margin: 0;
+        padding: 0;
+        font-family: 'Arial', sans-serif;
+        background: linear-gradient(to right, #ff9a9e, #fad0c4);
+        overflow: hidden;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        color: #fff;
+    }
+
+    .container {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 50px;
+        border-radius: 20px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        position: relative;
+        z-index: 2;
+    }
+
+    h1 {
+        font-size: 2.5em;
+        margin-bottom: 40px;
     }
 
     button {
-      padding: 15px 30px;
-      font-size: 20px;
-      background-color: #ff4d6d;
-      color: white;
-      border: none;
-      border-radius: 30px;
-      cursor: pointer;
-      margin: 10px;
+        font-size: 1.5em;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin: 10px;
     }
 
-    #question {
-      display: none;
-      font-size: 28px;
-      margin-top: 20px;
+    #yesBtn {
+        background-color: #ff4b5c;
+        color: #fff;
     }
 
+    #yesBtn:hover {
+        background-color: #ff6b81;
+        transform: scale(1.1);
+    }
+
+    #noBtn {
+        background-color: #aaa;
+        color: #fff;
+        position: relative;
+    }
+
+    /* coeurs flottants de fond */
     .heart {
-      position: absolute;
-      font-size: 24px;
-      animation: floatUp 2s ease-out forwards;
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: red;
+        transform: rotate(-45deg);
+        animation: float 4s linear infinite;
+        opacity: 0.7;
+        z-index: 1;
     }
 
-    @keyframes floatUp {
-      from {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      to {
-        opacity: 0;
-        transform: translateY(-150px);
-      }
+    .heart::before,
+    .heart::after {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: red;
+        border-radius: 50%;
     }
-  </style>
+
+    .heart::before { top: -10px; left: 0; }
+    .heart::after { left: 10px; top: 0; }
+
+    @keyframes float {
+        0% { transform: translate(0,0) rotate(-45deg); opacity:1;}
+        100% { transform: translate(-100px,-600px) rotate(-45deg); opacity:0;}
+    }
+
+    /* Explosion de coeurs */
+    .burst-heart {
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        background: pink;
+        transform: rotate(-45deg);
+        animation: burst 1s forwards;
+        z-index: 999;
+    }
+
+    .burst-heart::before,
+    .burst-heart::after {
+        content: "";
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        background: pink;
+        border-radius: 50%;
+    }
+
+    .burst-heart::before { top: -7.5px; left: 0; }
+    .burst-heart::after { left: 7.5px; top: 0; }
+
+    @keyframes burst {
+        0% { transform: translate(0,0) rotate(-45deg); opacity:1;}
+        100% { transform: translate(var(--x), var(--y)) rotate(-45deg); opacity:0;}
+    }
+</style>
 </head>
-
 <body>
+<div class="container">
+    <h1>Veux-tu être ma Valentine ? 💌</h1>
+    <button id="yesBtn">Oui ! ❤️</button>
+    <button id="noBtn">Non 😢</button>
+</div>
 
-  <button onclick="showQuestion()">Clique ici 💌</button>
+<script>
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
 
-  <div id="question">
-    Veux-tu être ma Valentine ? 💖<br>
-    <button onclick="yes()">OUI 💘</button>
-  </div>
+    // Oui clique
+    yesBtn.addEventListener('click', () => {
+        yesBtn.textContent = "❤️ Tu es ma Valentine ! ❤️";
+        yesBtn.disabled = true;
+        noBtn.style.display = 'none';
+        explodeHearts(50); // explosion de 50 coeurs
+        alert("💖 Je savais que tu dirais oui ! 💖");
+    });
 
-  <script>
-    function showQuestion() {
-      document.getElementById("question").style.display = "block";
-    }
+    // Non bouton qui fuit
+    noBtn.addEventListener('mouseenter', () => {
+        const x = Math.floor(Math.random() * (window.innerWidth - noBtn.offsetWidth));
+        const y = Math.floor(Math.random() * (window.innerHeight - noBtn.offsetHeight));
+        noBtn.style.position = 'absolute';
+        noBtn.style.left = x + 'px';
+        noBtn.style.top = y + 'px';
+    });
 
-    function yes() {
-      for (let i = 0; i < 20; i++) {
-        const heart = document.createElement("div");
-        heart.className = "heart";
-        heart.textContent = "💖";
-        heart.style.left = Math.random() * window.innerWidth + "px";
-        heart.style.top = Math.random() * window.innerHeight + "px";
+    // coeurs qui tombent en fond
+    function createHeart() {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.style.left = Math.random() * window.innerWidth + 'px';
+        heart.style.width = 10 + Math.random()*20 + 'px';
+        heart.style.height = heart.style.width;
+        heart.style.animationDuration = 2 + Math.random()*3 + 's';
         document.body.appendChild(heart);
-        setTimeout(() => heart.remove(), 2000);
-      }
+        setTimeout(() => heart.remove(), 5000);
     }
-  </script>
+    setInterval(createHeart, 300);
 
+    // explosion de coeurs
+    function explodeHearts(count) {
+        for(let i=0; i<count; i++){
+            const heart = document.createElement('div');
+            heart.classList.add('burst-heart');
+            heart.style.left = (yesBtn.offsetLeft + yesBtn.offsetWidth/2) + 'px';
+            heart.style.top = (yesBtn.offsetTop + yesBtn.offsetHeight/2) + 'px';
+            const x = (Math.random()-0.5)*500 + 'px';
+            const y = (Math.random()-0.5)*500 + 'px';
+            heart.style.setProperty('--x', x);
+            heart.style.setProperty('--y', y);
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+    }
+</script>
 </body>
 </html>
